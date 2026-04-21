@@ -63,7 +63,7 @@ fun ShoppingListApp_RoomTheme(
 ) {
     Crossfade(
         targetState = darkTheme,
-        animationSpec = tween(700)
+        animationSpec = tween(400)
     ) { isDark ->
 
         val colorScheme = when {

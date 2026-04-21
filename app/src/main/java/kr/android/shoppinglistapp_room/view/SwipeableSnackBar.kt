@@ -18,6 +18,8 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import kr.android.shoppinglistapp_room.ui.theme.GreenPrimaryContainerDark
 
@@ -25,6 +27,9 @@ import kr.android.shoppinglistapp_room.ui.theme.GreenPrimaryContainerDark
 fun SwipeableSnackBar(
     snackBarHostState: SnackbarHostState
 ){
+
+    val haptic = LocalHapticFeedback.current
+
     SnackbarHost(
         hostState = snackBarHostState,
         modifier = Modifier
@@ -37,6 +42,9 @@ fun SwipeableSnackBar(
                 confirmValueChange = {
                     value ->
                     if (value != SwipeToDismissBoxValue.Settled){
+                        haptic.performHapticFeedback(
+                            HapticFeedbackType.LongPress
+                        )
                         snackBarData.dismiss()
                         true
                     } else {
