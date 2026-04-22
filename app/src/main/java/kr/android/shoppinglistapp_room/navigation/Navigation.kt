@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.dialog
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -39,7 +40,7 @@ fun Navigation (
     context : Context,
     locationUtil: LocationUtil
 ) {
-    AnimatedNavHost(
+    NavHost(
         navController = navController,
         startDestination = Screens.HomeScreen.route
     ){
@@ -105,7 +106,7 @@ fun Navigation (
                         locationViewModel.fetchAddress("${locationData.latitude}, ${locationData.longitude}")
 
                         //goes back to the home screen
-                        navController.popBackStack()
+                        navController.navigateUp()
                     }
                 )
             } else {

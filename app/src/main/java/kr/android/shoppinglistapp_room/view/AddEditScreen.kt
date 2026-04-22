@@ -66,7 +66,8 @@ fun AddEditScreen(
                     onThemeChange = onThemeChange,
                     locationViewModel = locationViewModel,
                     locationUtil = locationUtil,
-                    navController = navController
+                    navController = navController,
+                    onBackNavClicked = { navController.navigateUp() }
                 )
             },
             snackbarHost = { SwipeableSnackBar(snackBarHostState) }
@@ -225,7 +226,21 @@ fun AddEditScreen(
                                     }
                                 )
                                 DropdownMenuItem(
+                                    text = { Text("gms") },
+                                    onClick = {
+                                        onUnitSelect()
+                                        menuExpanded = false
+                                    }
+                                )
+                                DropdownMenuItem(
                                     text = { Text("lts") },
+                                    onClick = {
+                                        onUnitSelect()
+                                        menuExpanded = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("mls") },
                                     onClick = {
                                         onUnitSelect()
                                         menuExpanded = false

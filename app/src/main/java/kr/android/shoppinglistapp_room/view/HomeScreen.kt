@@ -88,11 +88,11 @@ fun HomeScreen(
                         ShoppingItem(
                             0L,
                             "Eggs",
-                            30.00,
+                            30,
                             "packets"
                         ),
                         isDark = isDark,
-                        {}
+                        { navController.navigate(Screens.AddEditScreen.route) }
                     )
                 }
             }

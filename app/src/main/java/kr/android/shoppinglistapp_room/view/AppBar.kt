@@ -2,22 +2,31 @@
 
 package kr.android.shoppinglistapp_room.view
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -37,10 +46,12 @@ fun AppBar (
     locationUtil: LocationUtil,
     navController: NavHostController
 ) {
+    //home screen title check
+    val isHomeScreen = title == "Shopping List"
 
     //back icon visible if NOT in home screen
-    val navigationIcon : (@Composable () -> Unit) = {
-        if (!title.contains("Shopping List")){
+    val navigationIcon: (@Composable () -> Unit) = {
+        if (!isHomeScreen) {
             IconButton(
                 onClick = { onBackNavClicked() }
             ) {
@@ -54,31 +65,11 @@ fun AppBar (
     }
 
     //location and theme selector dropdown visible ONLY in home screen
-    val actionIcons : (@Composable (RowScope.() -> Unit)) = {
-        if (title.contains("Shopping List")){
-            Row(
-                modifier = Modifier
-                    .padding(4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+    val actionIcons: (@Composable (RowScope.() -> Unit)) = {
+        if (isHomeScreen) {
+            Box(
+                modifier = Modifier.padding(end = 12.dp)
             ) {
-
-                IconButton(
-                    onClick = {
-                        locationUtil.requestLocationUpdates(locationViewModel = locationViewModel)
-                        navController.navigate(Screens.LocationSelector.route){
-                            this.launchSingleTop
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = "location",
-                        tint = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-
                 ThemeSelectorDropdown(
                     current = themeMode,
                     onChange = onThemeChange
@@ -87,28 +78,72 @@ fun AppBar (
         }
     }
 
-    TopAppBar(
-        modifier = Modifier
-            .fillMaxWidth(),
-        title = {
-            Text(
-                text = title,
-                modifier = Modifier
-                    .padding(start = 4.dp)
-                    .heightIn(30.dp),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 35.sp
-            )
-        },
-        windowInsets = TopAppBarDefaults.windowInsets,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary
-        ),
-        //on left
-        navigationIcon = navigationIcon,
-        //on right
-        actions = actionIcons
-    )
+    //formatted address from lat-long
+    val address = locationViewModel.address.value
+        .firstOrNull()
+        ?.formatted_address
+        .orEmpty()
 
+
+    Column {
+
+        TopAppBar(
+            modifier = Modifier
+                .fillMaxWidth(),
+            title = {
+                // Title Row
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 30.sp
+                )
+            },
+            windowInsets = TopAppBarDefaults.windowInsets,
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            ),
+            //on left
+            navigationIcon = navigationIcon,
+            //on right
+            actions = actionIcons
+        )
+
+        // Address Row
+        if (isHomeScreen && address.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = MaterialTheme.colorScheme.primary)
+                    .clickable {
+                        navController.navigate(Screens.LocationSelector.route) {
+                            launchSingleTop = true
+                        }
+                    }
+                    .padding(horizontal = 12.dp)
+                    .padding(bottom = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = "location",
+                    modifier = Modifier.size(18.dp),
+                    tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f)
+                )
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                Text(
+                    text = address,
+                    maxLines = 1,
+                    fontWeight = FontWeight.Bold,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.weight(1f)
+                )
+
+            }
+        }
+    }
 }
