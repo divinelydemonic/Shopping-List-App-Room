@@ -27,6 +27,8 @@ import kotlinx.coroutines.launch
 import kr.android.shoppinglistapp_room.R
 import kr.android.shoppinglistapp_room.ui.theme.ShoppingListApp_RoomTheme
 import kr.android.shoppinglistapp_room.ui.theme.ThemeMode
+import kr.android.shoppinglistapp_room.util.LocationUtil
+import kr.android.shoppinglistapp_room.viewmodel.LocationViewModel
 
 @Composable
 fun AddEditScreen(
@@ -34,6 +36,8 @@ fun AddEditScreen(
     isDark : Boolean,
     themeMode: ThemeMode,
     onThemeChange : (ThemeMode) -> Unit,
+    locationViewModel: LocationViewModel,
+    locationUtil: LocationUtil,
     navController: NavHostController,
     onValueChange : () -> Unit,
     onDecrease : () -> Unit,
@@ -59,7 +63,10 @@ fun AddEditScreen(
                         stringResource(id = R.string.add_item)
                     },
                     themeMode = themeMode,
-                    onThemeChange = onThemeChange
+                    onThemeChange = onThemeChange,
+                    locationViewModel = locationViewModel,
+                    locationUtil = locationUtil,
+                    navController = navController
                 )
             },
             snackbarHost = { SwipeableSnackBar(snackBarHostState) }

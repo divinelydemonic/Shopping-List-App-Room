@@ -26,13 +26,17 @@ import kr.android.shoppinglistapp_room.navigation.Screens
 import kr.android.shoppinglistapp_room.ui.theme.GreenPrimaryContainerDark
 import kr.android.shoppinglistapp_room.ui.theme.ShoppingListApp_RoomTheme
 import kr.android.shoppinglistapp_room.ui.theme.ThemeMode
+import kr.android.shoppinglistapp_room.util.LocationUtil
+import kr.android.shoppinglistapp_room.viewmodel.LocationViewModel
 
 @Composable
 fun HomeScreen(
     themeMode: ThemeMode,
     isDark : Boolean,
     onThemeChange : (ThemeMode) -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
+    locationViewModel: LocationViewModel,
+    locationUtil: LocationUtil
 ) {
 
     val snackBarHostState = remember { SnackbarHostState() }
@@ -44,7 +48,10 @@ fun HomeScreen(
                 AppBar(
                     title = "Shopping List",
                     themeMode = themeMode,
-                    onThemeChange = onThemeChange
+                    onThemeChange = onThemeChange,
+                    locationViewModel = locationViewModel,
+                    locationUtil = locationUtil,
+                    navController = navController
                 )
             },
             floatingActionButton = {

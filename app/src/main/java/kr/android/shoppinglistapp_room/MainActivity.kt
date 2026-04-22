@@ -14,10 +14,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import kr.android.shoppinglistapp_room.navigation.Navigation
 import kr.android.shoppinglistapp_room.ui.theme.ShoppingListApp_RoomTheme
 import kr.android.shoppinglistapp_room.ui.theme.ThemeMode
+import kr.android.shoppinglistapp_room.util.LocationPermissionHandler
+import kr.android.shoppinglistapp_room.util.LocationUtil
+import kr.android.shoppinglistapp_room.viewmodel.LocationViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,19 +41,29 @@ class MainActivity : ComponentActivity() {
                 ThemeMode.SYSTEM -> isSystemInDarkTheme()
             }
 
+            val locationViewModel : LocationViewModel = viewModel()
             val navController = rememberNavController()
             val context = LocalContext.current
+            val locationUtil = LocationUtil(context)
 
             ShoppingListApp_RoomTheme (darkTheme = isDark) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Navigation(
-                        modifier = Modifier.padding(innerPadding),
-                        themeMode = themeMode,
-                        isDark = isDark,
-                        onThemeChange = { themeMode = it },
-                        navController = navController,
-                        context = context
-                    )
+                    LocationPermissionHandler(
+                        locationViewModel = locationViewModel,
+                        locationUtil = locationUtil,
+                        navController = navController
+                    ) {
+                        Navigation(
+                            modifier = Modifier.padding(innerPadding),
+                            themeMode = themeMode,
+                            isDark = isDark,
+                            onThemeChange = { themeMode = it },
+                            locationViewModel = locationViewModel,
+                            navController = navController,
+                            context = context,
+                            locationUtil = locationUtil
+                        )
+                    }
                 }
             }
         }

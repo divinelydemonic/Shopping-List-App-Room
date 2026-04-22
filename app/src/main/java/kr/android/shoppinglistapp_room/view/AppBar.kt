@@ -20,8 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import kr.android.shoppinglistapp_room.navigation.Screens
 import kr.android.shoppinglistapp_room.ui.theme.ThemeMode
 import kr.android.shoppinglistapp_room.ui.theme.ThemeSelectorDropdown
+import kr.android.shoppinglistapp_room.util.LocationUtil
+import kr.android.shoppinglistapp_room.viewmodel.LocationViewModel
 
 @Composable
 fun AppBar (
@@ -29,6 +33,9 @@ fun AppBar (
     onBackNavClicked : () -> Unit = {},
     themeMode: ThemeMode,
     onThemeChange: (ThemeMode) -> Unit,
+    locationViewModel: LocationViewModel,
+    locationUtil: LocationUtil,
+    navController: NavHostController
 ) {
 
     //back icon visible if NOT in home screen
@@ -57,7 +64,12 @@ fun AppBar (
             ) {
 
                 IconButton(
-                    onClick = {}
+                    onClick = {
+                        locationUtil.requestLocationUpdates(locationViewModel = locationViewModel)
+                        navController.navigate(Screens.LocationSelector.route){
+                            this.launchSingleTop
+                        }
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.LocationOn,

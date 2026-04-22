@@ -7,6 +7,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import kr.android.shoppinglistapp_room.ui.theme.ThemeMode
 
 // --------------------
 // LIGHT COLOR SCHEME
