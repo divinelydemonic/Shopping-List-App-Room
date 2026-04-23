@@ -82,7 +82,7 @@ fun AppBar (
     val address = locationViewModel.address.value
         .firstOrNull()
         ?.formatted_address
-        .orEmpty()
+        ?:"Click to set location"
 
 
     Column {

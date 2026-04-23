@@ -83,9 +83,6 @@ dependencies {
     //viewmodel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
 
-    //navigation animation
-    implementation("com.google.accompanist:accompanist-navigation-animation:0.34.0")
-
     // Icons
     implementation("androidx.compose.material:material-icons-extended")
 

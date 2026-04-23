@@ -1,15 +1,8 @@
-@file:OptIn(ExperimentalAnimationApi::class)
-
 package kr.android.shoppinglistapp_room.navigation
 
 import android.content.Context
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -19,9 +12,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
 import kr.android.shoppinglistapp_room.ui.theme.ThemeMode
 import kr.android.shoppinglistapp_room.util.LocationUtil
 import kr.android.shoppinglistapp_room.view.AddEditScreen
@@ -46,13 +38,7 @@ fun Navigation (
     ){
 
         //home screen
-        composable(
-            route = Screens.HomeScreen.route,
-            enterTransition = { fadeIn( tween(300) ) },
-            popEnterTransition = { fadeIn( tween(300) ) },
-            exitTransition = { fadeOut( tween(300) ) },
-            popExitTransition = { fadeOut( tween(300) ) }
-        ){
+        composable( route = Screens.HomeScreen.route ){
             HomeScreen(
                 themeMode = themeMode,
                 isDark = isDark,
@@ -64,13 +50,7 @@ fun Navigation (
         }
 
         //add-edit screen
-        composable(
-            route = Screens.AddEditScreen.route,
-            enterTransition = { fadeIn( tween(300) ) },
-            popEnterTransition = { fadeIn( tween(300) ) },
-            exitTransition = { fadeOut( tween(300) ) },
-            popExitTransition = { fadeOut( tween(300) ) }
-        ){
+        composable( route = Screens.AddEditScreen.route ){
             AddEditScreen(
                 id = 0L,
                 isDark = isDark,
@@ -87,7 +67,7 @@ fun Navigation (
         }
 
         //location selection dialog
-        dialog( route = Screens.LocationSelector.route ){
+        composable( route = Screens.LocationSelector.route ){
 
             //starts with the last selected location, if not available, starts with the current live location
             val startLocation = locationViewModel.lastSavedLocation.value
@@ -107,7 +87,9 @@ fun Navigation (
 
                         //goes back to the home screen
                         navController.navigateUp()
-                    }
+                    },
+                    navController = navController,
+                    locationViewModel = locationViewModel
                 )
             } else {
                 //map loading

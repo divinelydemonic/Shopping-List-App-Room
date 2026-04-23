@@ -1,6 +1,10 @@
 package kr.android.shoppinglistapp_room.view
 
+import android.app.Activity
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -8,20 +12,47 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import kr.android.shoppinglistapp_room.model.LocationData
+import kr.android.shoppinglistapp_room.viewmodel.LocationViewModel
 
 @Composable
 fun LocationSelector(
     location: LocationData,
-    onLocationSelected : (LocationData) -> Unit
+    onLocationSelected : (LocationData) -> Unit,
+    navController: NavHostController,
+    locationViewModel: LocationViewModel
 ) {
+
+    val context = LocalContext.current
+    val activity = context as? Activity
+    var pressedBackOnce by remember { mutableStateOf(false) }
+    val hasLocation = locationViewModel.lastSavedLocation.value != null
+
+    //to handle the back button
+    BackHandler {
+        if (hasLocation){
+            navController.navigateUp()
+        } else if (pressedBackOnce) {
+            activity?.finish()
+        } else {
+            pressedBackOnce = true
+            Toast.makeText(
+                context,
+                "Please select a location to continue!",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
 
     //live location
     val userLocation = remember {
@@ -57,16 +88,33 @@ fun LocationSelector(
         verticalArrangement = Arrangement.Center
     ) {
 
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            contentAlignment = Alignment.Center
+        ){
+            Text(
+                text = "Select location",
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.displayLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        Spacer(Modifier.height(8.dp))
+
         Card(
             modifier = Modifier
-                .height(700.dp)
-                .padding(8.dp),
+                .height(650.dp)
+                .padding(8.dp)
+                .padding(horizontal = 16.dp),
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(
                 defaultElevation = 6.dp
             ),
             border = BorderStroke(
-                width = 3.dp,
+                width = 2.dp,
                 color = MaterialTheme.colorScheme.primary
             )
         ) {
@@ -85,7 +133,7 @@ fun LocationSelector(
             }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(24.dp))
 
         var newLocation : LocationData
 
