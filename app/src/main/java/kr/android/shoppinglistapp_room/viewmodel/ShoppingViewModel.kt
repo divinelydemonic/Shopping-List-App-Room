@@ -20,23 +20,9 @@ class ShoppingViewModel(
     var shoppingItemQuantity by mutableStateOf(0)   //item quantity
     var shoppingItemUnit by mutableStateOf("")  //item quantity  unit
 
-
-    //updating the item name
-    fun updateItemName (newName : String) {
-        shoppingItemName = newName
-    }
-
-    //updating the item quantity
-    fun updateItemQuantity (newQuantity : Int) {
-       shoppingItemQuantity = newQuantity
-    }
-
-    //updating the item unit
-    fun updateItemUnit (newUnit : String) {
-        shoppingItemUnit = newUnit
-    }
-
-
+    //-------------------------------
+    //----- DATABASE FUNCTIONS -----
+    //-------------------------------
     //adding an item
     fun addItem (shoppingItem: ShoppingItem) {
         viewModelScope.launch (Dispatchers.IO) {
@@ -64,6 +50,48 @@ class ShoppingViewModel(
     //get item by id
     fun getItemById (id : Long) : Flow<ShoppingItem> {
         return shoppingRepository.getItemById(id)
+    }
+
+    //-------------------------------
+    //-------- UI FUNCTIONS --------
+    //-------------------------------
+
+    //updating name field
+    fun onNameChange(newName: String) {
+        shoppingItemName = newName.take(25)
+    }
+
+    //updating quantity field
+    fun onQuantityChange(input: String) {
+        if (input.isEmpty()) {
+            shoppingItemQuantity = 0
+            return
+        }
+
+        val number = input.toIntOrNull() ?: return
+
+        if (number in 0..999) {
+            shoppingItemQuantity = number
+        }
+    }
+
+    //quantity increment button
+    fun incrementQuantity() {
+        if (shoppingItemQuantity < 999) {
+            shoppingItemQuantity++
+        }
+    }
+
+    //quantity decrement button
+    fun decrementQuantity() {
+        if (shoppingItemQuantity > 0) {
+            shoppingItemQuantity--
+        }
+    }
+
+    //updating item quantity unit
+    fun onUnitSelected(unit: String) {
+        shoppingItemUnit = unit
     }
 
 }

@@ -63,11 +63,13 @@ fun AddEditScreen(
         mutableStateOf(shoppingViewModel.shoppingItemQuantity.toString())
     }
 
-    val quantity = quantityText.toIntOrNull() ?: 0
-
-    val validInput = shoppingViewModel.shoppingItemName.isNotEmpty()
-            && quantity > 0
-            && shoppingViewModel.shoppingItemUnit.isNotEmpty()
+    val validInput by remember {
+        derivedStateOf {
+            shoppingViewModel.shoppingItemName.isNotEmpty() &&
+            shoppingViewModel.shoppingItemQuantity > 0 &&
+            shoppingViewModel.shoppingItemUnit.isNotEmpty()
+        }
+    }
 
     val itemNameLimit = 25
 
@@ -124,7 +126,7 @@ fun AddEditScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp),
                     value = shoppingViewModel.shoppingItemName,
-                    onValueChange = { shoppingViewModel.updateItemName(it.take(itemNameLimit)) },
+                    onValueChange = { shoppingViewModel.onNameChange(it) },
                     label = {
                         Text(
                             "Item Name",
@@ -153,7 +155,8 @@ fun AddEditScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 32.dp),
+                        .padding(horizontal = 24.dp)
+                        .padding(end = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -179,13 +182,10 @@ fun AddEditScreen(
                                 //decrease icon button
                                 IconButton(
                                     onClick = {
-                                        val current = quantityText.toIntOrNull() ?: 0
-                                        if (current > 0) {
-                                            val newValue = current - 1
-                                            shoppingViewModel.updateItemQuantity(newValue)
-                                            quantityText = newValue.toString()
-                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        }
+                                        shoppingViewModel.decrementQuantity()
+                                        quantityText = shoppingViewModel.shoppingItemQuantity.toString()
+
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                     }
                                 ) {
                                     Icon(
@@ -202,16 +202,11 @@ fun AddEditScreen(
                                         .width(70.dp),
                                     value = quantityText,
                                     onValueChange = {
-                                        text ->
-                                        // allow empty OR up to 3 digits only
-                                        if (text.isEmpty() || (text.length <= 3 && text.all { it.isDigit() })) {
-                                            quantityText = text
-                                            // update VM only if valid number
-                                            val number = text.toIntOrNull()
-                                            if (number != null) {
-                                                shoppingViewModel.updateItemQuantity(number)
-                                            }
-                                        }
+                                        input ->
+                                        // allow only digits and max 3 chars
+                                        val filtered = input.filter { it.isDigit() }.take(3)
+                                        quantityText = filtered
+                                        shoppingViewModel.onQuantityChange(filtered)
                                     },
                                     textStyle = LocalTextStyle.current.copy(
                                         textAlign = TextAlign.Center
@@ -226,9 +221,8 @@ fun AddEditScreen(
                                 //increase icon button
                                 IconButton(
                                     onClick = {
-                                        val newValue = (quantityText.toIntOrNull() ?: 0) + 1
-                                        shoppingViewModel.updateItemQuantity(newValue)
-                                        quantityText = newValue.toString()
+                                        shoppingViewModel.incrementQuantity()
+                                        quantityText = shoppingViewModel.shoppingItemQuantity.toString()
 
                                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                     }
@@ -270,7 +264,7 @@ fun AddEditScreen(
                             ) {
                                 TextField(
                                     value = shoppingViewModel.shoppingItemUnit.ifEmpty { "select" },
-                                    onValueChange = { shoppingViewModel.updateItemUnit(shoppingViewModel.shoppingItemUnit) },
+                                    onValueChange = {},
                                     readOnly = true,
                                     modifier = Modifier
                                         .menuAnchor()
@@ -320,7 +314,7 @@ fun AddEditScreen(
                                                 }
                                             },
                                             onClick = {
-                                                shoppingViewModel.updateItemUnit(unit)
+                                                shoppingViewModel.onUnitSelected(unit)
                                                 menuExpanded = false
 
                                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -349,13 +343,14 @@ fun AddEditScreen(
                         .height(50.dp),
                     onClick = {
 
+                        val quantity = shoppingViewModel.shoppingItemQuantity
+
                         if (shoppingViewModel.shoppingItemName.isNotEmpty()
-                            && quantityText.isNotEmpty()
+                            && quantity > 0
                             && shoppingViewModel.shoppingItemUnit.isNotEmpty()){
 
                             if (id != 0L){
                                 //update item
-                                val quantity = quantityText.toIntOrNull() ?: 0
                                 shoppingViewModel.updateItem(
                                     ShoppingItem(
                                         id = id,
@@ -377,7 +372,6 @@ fun AddEditScreen(
 
                             } else {
                                 //add item
-                                val quantity = quantityText.toIntOrNull() ?: 0
                                 shoppingViewModel.addItem(
                                     ShoppingItem(
                                         name = shoppingViewModel.shoppingItemName.trim(),
