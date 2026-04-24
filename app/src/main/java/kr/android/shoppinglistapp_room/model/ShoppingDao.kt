@@ -1,11 +1,6 @@
 package kr.android.shoppinglistapp_room.model
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -26,5 +21,4 @@ interface ShoppingDao {
 
     @Query("select * from `shopping_table` where id = :id")
     fun getItemById(id : Long) : Flow<ShoppingItem>
-
 }

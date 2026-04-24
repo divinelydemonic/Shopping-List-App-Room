@@ -71,7 +71,7 @@ fun HomeScreen(
             },
             floatingActionButton = {
                 FloatingActionButton(
-                    onClick = { navController.navigate(Screens.AddEditScreen.route + "/0L") },
+                    onClick = { navController.navigate(Screens.AddEditScreen.route + "/0") },
                     modifier = Modifier
                         .padding(30.dp)
                         .size(70.dp)
@@ -112,8 +112,8 @@ fun HomeScreen(
 
                         Image(
                             painter = painterResource(id = R.drawable.empty_shoppinglist),
-                            contentDescription = "Empty wishlist",
-                            modifier = Modifier.size(470.dp)
+                            contentDescription = "Empty shopping cart",
+                            modifier = Modifier.size(450.dp)
                         )
 
                         Text(
@@ -171,7 +171,9 @@ fun HomeScreen(
                                 Box(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .clip(RoundedCornerShape(24.dp))
+                                        .padding(horizontal = 10.dp)
+                                        .padding(top = 10.dp)
+                                        .clip(RoundedCornerShape(16.dp))
                                         .background(bgColor),
                                     contentAlignment = Alignment.CenterEnd
                                 ) {
@@ -217,33 +219,46 @@ fun HomeScreen(
                                     pendingItem = null
                                 },
                                 title = {
-                                    Text("Delete Item")
+                                    Text(
+                                        "Delete Item",
+                                        style = MaterialTheme.typography.titleLarge
+                                    )
                                 },
                                 text = {
                                     Text("Are you sure you want to delete \"${pendingItem?.name}\"?")
                                 },
                                 confirmButton = {
-                                    TextButton(
+                                    Button(
                                         onClick = {
+                                            val deletedName = pendingItem?.name ?: ""
                                             shoppingViewModel.deleteItem(pendingItem!!)
                                             scope.launch {
-                                                snackBarHostState.showSnackbar("${pendingItem?.name} deleted")
+                                                snackBarHostState.showSnackbar("$deletedName deleted")
                                             }
                                             showDialog = false
                                             pendingItem = null
-                                        }
+                                        },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.error,
+                                            contentColor = MaterialTheme.colorScheme.onError
+                                        ),
+                                        shape = RoundedCornerShape(24.dp)
                                     ) {
-                                        Text("Delete", color = MaterialTheme.colorScheme.error)
+                                        Text("Delete", fontWeight = FontWeight.Bold)
                                     }
                                 },
                                 dismissButton = {
-                                    TextButton(
+                                    OutlinedButton(
                                         onClick = {
                                             showDialog = false
                                             pendingItem = null
-                                        }
+                                        },
+                                        shape = RoundedCornerShape(24.dp)
                                     ) {
-                                        Text("Cancel")
+                                        Text(
+                                            "Cancel", fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
                                     }
                                 }
                             )
@@ -289,10 +304,10 @@ fun ShoppingItemView (
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 18.dp)
+            .padding(horizontal = 10.dp)
             .clickable { onClick() }
-            .padding(top = 12.dp),
-        shape = RoundedCornerShape(12.dp),
+            .padding(top = 10.dp),
+        shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.elevatedCardElevation(4.dp),
         colors = CardDefaults.cardColors(
             containerColor = containerColor,

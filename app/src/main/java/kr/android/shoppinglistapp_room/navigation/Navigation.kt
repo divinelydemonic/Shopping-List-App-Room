@@ -38,20 +38,11 @@ fun Navigation (
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screens.HomeScreen.route + "/0"
+        startDestination = Screens.HomeScreen.route
     ){
 
         //home screen
-        composable(
-            route = Screens.HomeScreen.route + "/{id}",
-            arguments = listOf(
-                navArgument("id"){
-                    type = NavType.LongType
-                    defaultValue = 0L
-                    nullable = false
-                }
-            )
-        ){
+        composable(route = Screens.HomeScreen.route){
             HomeScreen(
                 themeMode = themeMode,
                 isDark = isDark,
@@ -64,7 +55,16 @@ fun Navigation (
         }
 
         //add-edit screen
-        composable( route = Screens.AddEditScreen.route ){
+        composable(
+            route = Screens.AddEditScreen.route + "/{id}",
+            arguments = listOf(
+                navArgument("id"){
+                    type = NavType.LongType
+                    defaultValue = 0L
+                    nullable = false
+                }
+            )
+            ){
             entry ->
 
             val id = entry.arguments?.getLong("id") ?: 0L
@@ -77,11 +77,7 @@ fun Navigation (
                 locationUtil = locationUtil,
                 shoppingViewModel = shoppingViewModel,
                 locationViewModel = locationViewModel,
-                navController = navController,
-                onValueChange = {},
-                onDecrease = {},
-                onIncrease = {},
-                onUnitSelect = {}
+                navController = navController
             )
         }
 
