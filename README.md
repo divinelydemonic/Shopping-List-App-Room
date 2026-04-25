@@ -114,10 +114,10 @@ graph TD
 
 ## 🎥 Demo Video
 
-> Demo video link here
+> Demo video link
 
 ```md
-https://demo-video-link.com
+https://youtu.be/4nP43BVoWcs
 ```
 
 ---
