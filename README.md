@@ -114,7 +114,7 @@ graph TD
 
 ## 🎥 Demo Video
 
-> Demo video link
+> YouTube
 
 ```md
 https://youtu.be/4nP43BVoWcs
