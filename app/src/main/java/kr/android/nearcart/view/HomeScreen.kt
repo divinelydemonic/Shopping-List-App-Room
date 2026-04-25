@@ -1,5 +1,9 @@
 package kr.android.nearcart.view
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,6 +25,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
@@ -169,45 +174,51 @@ fun HomeScreen(
                         // assign after creation
                         currentDismissState.value = dismissState
 
-                        SwipeToDismissBox(
-                            state = dismissState,
-                            backgroundContent = {
+                        key(item.id) {
+                            SwipeToDismissBox(
+                                state = dismissState,
+                                backgroundContent = {
+                                    val bgColor = when (dismissState.dismissDirection) {
+                                        SwipeToDismissBoxValue.EndToStart -> Color(0xFFFF5050)
+                                        SwipeToDismissBoxValue.StartToEnd -> Color.LightGray.copy(0.5f)
+                                        else -> Color.Transparent
+                                    }
 
-                                val direction = dismissState.dismissDirection
-                                val bgColor =
-                                    if (direction == SwipeToDismissBoxValue.StartToEnd)
-                                        Color.LightGray.copy(0.5f)
-                                    else Color(0xFFFF5050)
-
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(horizontal = 10.dp)
-                                        .padding(top = 10.dp)
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(bgColor),
-                                    contentAlignment = Alignment.CenterEnd
-                                ) {
-                                    Icon(
-                                        Icons.Default.DeleteSweep,
-                                        null,
-                                        tint = Color.White,
+                                    Box(
                                         modifier = Modifier
-                                            .padding(end = 16.dp)
-                                            .size(35.dp)
-                                    )
-                                }
-                            },
-                            enableDismissFromEndToStart = true,
-                            enableDismissFromStartToEnd = true
-                        ){
-                            ShoppingItemView(
-                                item = item,
-                                isDark = isDark,
-                                onClick = {
-                                    navController.navigate(route = Screens.AddEditScreen.route+"/${item.id}")
-                                }
-                            )
+                                            .fillMaxSize()
+                                            .padding(horizontal = 10.dp)
+                                            .padding(top = 10.dp)
+                                            .clip(RoundedCornerShape(16.dp))
+                                            .background(bgColor),
+                                        contentAlignment = Alignment.CenterEnd
+                                    ) {
+                                        Icon(
+                                            Icons.Default.DeleteSweep,
+                                            null,
+                                            tint = Color.White,
+                                            modifier = Modifier
+                                                .padding(end = 16.dp)
+                                                .size(35.dp)
+                                        )
+                                    }
+                                },
+                                enableDismissFromEndToStart = true,
+                                enableDismissFromStartToEnd = false
+                            ) {
+                                ShoppingItemView(
+                                    item = item,
+                                    isDark = isDark,
+                                    onClick = {
+                                        navController.navigate(
+                                            Screens.AddEditScreen.route + "/${item.id}"
+                                        )
+                                    },
+                                    onCheckedChange = { isChecked ->
+                                        shoppingViewModel.onItemChecked(item, isChecked)
+                                    }
+                                )
+                            }
                         }
 
                         var hapticTriggered by remember { mutableStateOf(false) }
@@ -294,20 +305,19 @@ fun HomeScreen(
 fun ShoppingItemView (
     item : ShoppingItem,
     isDark: Boolean,
-    onClick : () -> Unit
+    onClick : () -> Unit,
+    onCheckedChange: (Boolean) -> Unit
 ){
 
     val haptic = LocalHapticFeedback.current
 
-    var checked by remember { mutableStateOf(false) }
-
-    val containerColor = if (checked) {
+    val containerColor = if (item.isChecked) {
         if (isDark) Color.Gray else Color.LightGray
     } else {
         MaterialTheme.colorScheme.primaryContainer
     }
 
-    val textColor = if (checked) {
+    val textColor = if (item.isChecked) {
         MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
     } else {
         MaterialTheme.colorScheme.onPrimary
@@ -315,10 +325,25 @@ fun ShoppingItemView (
 
     val strikeColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
 
+    val scale by animateFloatAsState(
+        targetValue = if (item.isChecked) 0.95f else 1f,
+        animationSpec = tween(300)
+    )
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 10.dp)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .animateContentSize(
+                animationSpec = tween(
+                    durationMillis = 300,
+                    easing = FastOutSlowInEasing
+                )
+            )
             .clickable { onClick() }
             .padding(top = 10.dp),
         shape = RoundedCornerShape(16.dp),
@@ -339,10 +364,9 @@ fun ShoppingItemView (
         ) {
 
             Checkbox(
-                checked = checked,
-                onCheckedChange = {
-                    checked = it
-
+                checked = item.isChecked,
+                onCheckedChange = { isChecked ->
+                    onCheckedChange(isChecked)
                     haptic.performHapticFeedback(
                         HapticFeedbackType.ToggleOn
                     )
@@ -358,7 +382,7 @@ fun ShoppingItemView (
                 modifier = Modifier
                     .drawWithContent {
                         drawContent()
-                        if (checked) {
+                        if (item.isChecked) {
                             val strokeWidth = 2.dp.toPx()
                             drawLine(
                                 color = strikeColor,

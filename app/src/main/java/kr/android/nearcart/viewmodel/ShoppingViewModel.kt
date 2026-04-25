@@ -52,6 +52,14 @@ class ShoppingViewModel(
         return shoppingRepository.getItemById(id)
     }
 
+    fun onItemChecked(item: ShoppingItem, checked: Boolean) {
+        viewModelScope.launch {
+            shoppingRepository.updateItem(
+                item.copy(isChecked = checked)
+            )
+        }
+    }
+
     //-------------------------------
     //-------- UI FUNCTIONS --------
     //-------------------------------

@@ -16,8 +16,12 @@ interface ShoppingDao {
     @Delete
     suspend fun deleteItem(shoppingItem: ShoppingItem) : Int
 
-    @Query("select * from `shopping_table`")
-    fun getAllItems() : Flow<List<ShoppingItem>>
+//    @Query("select * from `shopping_table`")
+//    fun getAllItems() : Flow<List<ShoppingItem>>
+
+    //supports auto-sorting on checked
+    @Query("SELECT * FROM shopping_table ORDER BY is_checked ASC, id DESC")
+    fun getAllItems(): Flow<List<ShoppingItem>>
 
     @Query("select * from `shopping_table` where id = :id")
     fun getItemById(id : Long) : Flow<ShoppingItem>

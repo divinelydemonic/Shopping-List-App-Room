@@ -13,5 +13,7 @@ data class ShoppingItem(
     @ColumnInfo("item_quantity")
     val quantity : Int = 0,
     @ColumnInfo("item_unit")
-    val unit : String = ""
+    val unit : String = "",
+    @ColumnInfo("is_checked")
+    val isChecked: Boolean = false
 )

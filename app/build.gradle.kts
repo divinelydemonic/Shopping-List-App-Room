@@ -56,12 +56,12 @@ android {
 
 dependencies {
 
+    // Compose BOM (MUST be first)
+    implementation(platform(libs.androidx.compose.bom))
+
     implementation(libs.androidx.material3)
     val nav_version = "2.7.5"
     val room_version = "2.7.0"
-
-    // Compose BOM (MUST be first)
-    implementation(platform(libs.androidx.compose.bom))
 
     // 🗺️ Google Maps + Location (UI maps + GPS access)
     // Compose integration for Google Maps (Google Maps composable)
@@ -97,7 +97,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
